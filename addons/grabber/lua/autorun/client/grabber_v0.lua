@@ -363,6 +363,16 @@ hook.Add("InitPostEntity", "Grabber_InitPostEntity_LoadRepositories", function()
     grabber.LoadRepositoriesFromDisk()
 end)
 
+-- Hook into clientside chat, if the text is !grabber we want to hide it from everyone's chatbox, and then if ply is LocalPlayer(), open the GUI.
+hook.Add("OnPlayerChat", "Grabber_OnPlayerChat_OpenGrabberMenu", function(ply, text, teamChat, isDead)
+    if string.lower(text) == "!grabber" then
+        if ply == LocalPlayer() then
+            grabber.ShowGUI()
+        end
+        return true -- suppress !grabber commands for everyone
+    end
+end)
+
 
 -- =============================
 -- Grabber API
