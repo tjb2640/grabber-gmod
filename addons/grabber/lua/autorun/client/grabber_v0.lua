@@ -192,6 +192,7 @@ end
 local getRawURL = function(url)
     local rawUrl = string.Replace(url, "github.com", "raw.githubusercontent.com")
     rawUrl = string.Replace(rawUrl, "tree/", "")
+    rawUrl = string.Replace(rawUrl, "&amp;", "&")
     return string.Replace(unescapeHTMLString(rawUrl), " ", "%20")
 end
 
@@ -236,7 +237,7 @@ local _downloadFiles = function(repo, target)
         workerCount = workerCount + 1
 
         -- Start by performing a fetch to URL.
-        http.Fetch(f("%s/%s", baseUrl, url), function(body, size, headers, code)
+        http.Fetch(string.Replace(f("%s/%s", baseUrl, url), " ", "%20"), function(body, size, headers, code)
             local foundPaths = {}
 
             local lines = string.Explode("\n", body) -- consider delimiting in the match instead.
@@ -296,7 +297,7 @@ local _downloadFiles = function(repo, target)
                             if (code == 200) and body then
                                 file.Write(normalizeFilePath(unescapeHTMLString(filePath)), body)
                             else
-                                handleError(f("HTTP Code %d for %s", code))
+                                handleError(f("HTTP Code %d for %s", code, rawUrl))
                             end
                             workerCount = workerCount - 1
                         end, handleError, {})
@@ -1242,4 +1243,3 @@ if isReloading then
     grabber.Repositories = oldRepositories
     grabber.LoadRepositoriesFromDisk()
 end
-
